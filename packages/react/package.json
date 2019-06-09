@@ -1,0 +1,10 @@
+{
+  "name": "@rst-js/react",
+  "description": "React.js components for reStructuredText documents",
+  "version": "0.0.0-managed-by-release-script",
+  "main": "index.js",
+  "typings": "cjs/index.d.ts",
+  "peerDependencies": {
+    "react": "^16.8.6"
+  }
+}

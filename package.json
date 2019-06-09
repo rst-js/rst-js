@@ -1,0 +1,47 @@
+{
+  "private": true,
+  "version": "0.0.1-30",
+  "main": "dist/index.js",
+  "umd:main": "dist/rst-loader.umd.production.js",
+  "module": "dist/rst-loader.es.production.js",
+  "typings": "dist/index.d.ts",
+  "repository": "git@github.com:rst-js/rst-js.git",
+  "author": "Tomáš Ehrlich <tomas.ehrlich@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "etc test",
+    "build": "etc build",
+    "release": "etc release",
+    "release:dev": "etc release --dev"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "semi": false
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.7",
+    "et-scripts": "^0.0.1",
+    "husky": "^2.4.0",
+    "jest": "^24.8.0",
+    "lint-staged": "^8.2.0",
+    "react": "^16.8.6"
+  }
+}

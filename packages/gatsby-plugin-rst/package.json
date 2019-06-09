@@ -1,0 +1,11 @@
+{
+  "name": "gatsby-plugin-rst",
+  "description": "reStructuredText loader and transformer for GatsbyJS",
+  "version": "0.0.0-managed-by-release-script",
+  "main": "gatsby-node.js",
+  "dependencies": {
+    "@rst-js/loader": "latest",
+    "@rst-js/writer": "latest",
+    "escape-string-regexp": "^2.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@rst-js/loader",
+  "version": "0.0.0-managed-by-release-script",
+  "description": "reStructuredText loader for Webpack",
+  "main": "index.js",
+  "dependencies": {
+    "loader-utils": "^1.2.3",
+    "@rst-js/writer": "latest"
+  }
+}

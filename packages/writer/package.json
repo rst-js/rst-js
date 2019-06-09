@@ -1,0 +1,17 @@
+{
+  "name": "@rst-js/writer",
+  "description": "reStructuredText writers",
+  "version": "0.0.0-managed-by-release-script",
+  "main": "index.js",
+  "typings": "cjs/index.d.ts",
+  "dependencies": {
+    "@babel/generator": "^7.4.4",
+    "@babel/runtime": "^7.4.5",
+    "@babel/types": "^7.4.4",
+    "restructured": "^0.0.11"
+  },
+  "devDependencies": {
+    "@types/prettier": "^1.16.4",
+    "prettier": "^1.18.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "gatsby-plugin-rst",
+  "description": "reStructuredText loader and transformer for GatsbyJS",
+  "version": "0.0.0-managed-by-release-script",
+  "main": "gatsby-node.js",
+  "repository": "git@github.com:rst-js/gatsby-rst.git",
+  "author": "Tomáš Ehrlich <tomas.ehrlich@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@rst-js/loader": "latest",
+    "@rst-js/writer": "latest",
+    "escape-string-regexp": "^2.0.0"
+  }
+}

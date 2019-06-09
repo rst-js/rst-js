@@ -1,0 +1,13 @@
+{
+  "name": "@rst-js/loader",
+  "version": "0.0.0-managed-by-release-script",
+  "description": "reStructuredText loader for Webpack",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "repository": "git@github.com:rst-js/rst-js.git",
+  "author": "Tomáš Ehrlich <tomas.ehrlich@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "loader-utils": "^1.2.3"
+  }
+}

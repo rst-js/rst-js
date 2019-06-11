@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.0.1-30",
+  "version": "0.0.2",
   "main": "dist/index.js",
   "umd:main": "dist/rst-loader.umd.production.js",
   "module": "dist/rst-loader.es.production.js",

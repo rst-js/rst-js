@@ -4,8 +4,8 @@
   "version": "0.0.0-managed-by-release-script",
   "main": "gatsby-node.js",
   "dependencies": {
-    "@rst-js/loader": "latest",
-    "@rst-js/writer": "latest",
+    "@rst-js/loader": "0.0.0-managed-by-release-script",
+    "@rst-js/writer": "0.0.0-managed-by-release-script",
     "escape-string-regexp": "^2.0.0"
   }
 }

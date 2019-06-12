@@ -1,43 +1,10 @@
 import * as t from "@babel/types"
 import generate from "@babel/generator"
 
-type ComponentImports = {
-  [type: string]: [string, string]
-}
-
-const defaultComponents: ComponentImports = {
-  document: ["@rst-js/react", "Document"],
-  section: ["@rst-js/react", "Section"],
-  title: ["@rst-js/react", "Title"],
-  paragraph: ["@rst-js/react", "Paragraph"],
-  strong: ["@rst-js/react", "Strong"],
-  emphasis: ["@rst-js/react", "Emphasis"],
-  // interpreted_text: ["@rst-js/react", "InterpretedText"],
-  literal: ["@rst-js/react", "Literal"],
-  reference: ["@rst-js/react", "Reference"],
-  substitution_reference: ["@rst-js/react", "SubstitutionReference"],
-  footnote_reference: ["@rst-js/react", "FootnoteReference"],
-  citation_reference: ["@rst-js/react", "CitationReference"],
-
-  bullet_list: ["@rst-js/react", "BulletList"],
-  enumerated_list: ["@rst-js/react", "EnumeratedList"],
-  list_item: ["@rst-js/react", "ListItem"],
-  definition_list: ["@rst-js/react", "DefinitionList"],
-  definition_list_item: ["@rst-js/react", "DefinitionListItem"],
-  definition: ["@rst-js/react", "Definition"],
-  term: ["@rst-js/react", "Term"],
-
-  literal_block: ["@rst-js/react", "LiteralBlock"],
-  block_quote: ["@rst-js/react", "BlockQuote"],
-  transition: ["@rst-js/react", "Transition"]
-}
-
 export default function(parsed: any, { layout = null, components = {} } = {}) {
-  const allComponents = {
-    ...defaultComponents,
-    ...components
-  }
-  const documentState = new DocumentState({ components: allComponents })
+  const documentState = new DocumentState({
+    components: getComponents(components)
+  })
   const document = writeElement(parsed, documentState)
 
   const imports = getImports(documentState)
@@ -95,7 +62,6 @@ class DocumentState {
     const component = this.components[type]
 
     if (component == null) {
-      console.error(type)
       throw new Error(`Unknown component ${type}`)
     }
 
@@ -106,7 +72,7 @@ class DocumentState {
       ;[module, name] = component
     } else {
       module = component
-      name = type.replace(/(^\w)|(_\w)/, match => match.toUpperCase())
+      name = componentName(type)
       importType = "default"
     }
     this.addImport(module, name, importType)
@@ -180,3 +146,59 @@ function getImports(documentState: DocumentState) {
 
   return imports
 }
+
+const defaultModule = "@rst-js/react"
+
+const componentTypes = [
+  "document",
+  "section",
+  "title",
+  "paragraph",
+  "strong",
+  "emphasis",
+  // "interpreted_text",
+  "literal",
+  "reference",
+  "substitution_reference",
+  "footnote_reference",
+  "citation_reference",
+
+  "bullet_list",
+  "enumerated_list",
+  "list_item",
+  "definition_list",
+  "definition_list_item",
+  "definition",
+  "term",
+
+  "literal_block",
+  "block_quote",
+  "transition"
+] as const
+
+type ComponentImports = {
+  [type: string]: [string, string] | string
+}
+
+function getComponents(
+  source: ComponentImports | string = defaultModule
+): ComponentImports {
+  const components = {}
+  componentTypes.forEach(type => {
+    if (typeof source === "string") {
+      // Import all components from single module
+      components[type] = [source, componentName(type)]
+    } else {
+      // Override imports for specific compoennts
+      const customComponent = source[type]
+      components[type] =
+        customComponent != null
+          ? customComponent
+          : [defaultModule, componentName(type)]
+    }
+  })
+  return components
+}
+
+const componentName = value =>
+  value.replace(/(^|_)(\w)/g, (match, p1, p2) => p2.toUpperCase())

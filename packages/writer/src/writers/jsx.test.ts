@@ -22,6 +22,10 @@ describe("@rst-js/writers - jsx", () => {
       fileName: "with-components.rst"
     },
     {
+      name: "With custom components module",
+      fileName: "with-components-module.rst"
+    },
+    {
       name: "With custom layout",
       fileName: "with-layout.rst"
     }

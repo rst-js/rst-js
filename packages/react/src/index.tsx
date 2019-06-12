@@ -2,6 +2,8 @@ import * as React from "react"
 
 const SectionContext = React.createContext(0)
 
+export const useSection = () => React.useContext(SectionContext)
+
 export const Document = ({ children }) => <article>{children}</article>
 
 export const Section = ({ children, depth }) => (
@@ -11,7 +13,7 @@ export const Section = ({ children, depth }) => (
 )
 
 export const Title = ({ children }) => {
-  const depth = React.useContext(SectionContext)
+  const depth = useSection()
   return React.createElement(`h${depth}`, {}, children)
 }
 

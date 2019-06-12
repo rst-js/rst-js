@@ -18,6 +18,10 @@ describe("@rst-js/writers - jsx", () => {
       fileName: "empty.rst"
     },
     {
+      name: "With custom components",
+      fileName: "with-components.rst"
+    },
+    {
       name: "With custom layout",
       fileName: "with-layout.rst"
     }

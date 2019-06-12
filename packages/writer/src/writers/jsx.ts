@@ -1,19 +1,54 @@
 import * as t from "@babel/types"
 import generate from "@babel/generator"
 
-export default function(parsed: any, writerOptions = { layout: null }) {
-  const documentState = new DocumentState()
+type ComponentImports = {
+  [type: string]: [string, string]
+}
+
+const defaultComponents: ComponentImports = {
+  document: ["@rst-js/react", "Document"],
+  section: ["@rst-js/react", "Section"],
+  title: ["@rst-js/react", "Title"],
+  paragraph: ["@rst-js/react", "Paragraph"],
+  strong: ["@rst-js/react", "Strong"],
+  emphasis: ["@rst-js/react", "Emphasis"],
+  // interpreted_text: ["@rst-js/react", "InterpretedText"],
+  literal: ["@rst-js/react", "Literal"],
+  reference: ["@rst-js/react", "Reference"],
+  substitution_reference: ["@rst-js/react", "SubstitutionReference"],
+  footnote_reference: ["@rst-js/react", "FootnoteReference"],
+  citation_reference: ["@rst-js/react", "CitationReference"],
+
+  bullet_list: ["@rst-js/react", "BulletList"],
+  enumerated_list: ["@rst-js/react", "EnumeratedList"],
+  list_item: ["@rst-js/react", "ListItem"],
+  definition_list: ["@rst-js/react", "DefinitionList"],
+  definition_list_item: ["@rst-js/react", "DefinitionListItem"],
+  definition: ["@rst-js/react", "Definition"],
+  term: ["@rst-js/react", "Term"],
+
+  literal_block: ["@rst-js/react", "LiteralBlock"],
+  block_quote: ["@rst-js/react", "BlockQuote"],
+  transition: ["@rst-js/react", "Transition"]
+}
+
+export default function(parsed: any, { layout = null, components = {} } = {}) {
+  const allComponents = {
+    ...defaultComponents,
+    ...components
+  }
+  const documentState = new DocumentState({ components: allComponents })
   const document = writeElement(parsed, documentState)
 
   const imports = getImports(documentState)
   let wrappedDocument = document
 
-  if (writerOptions.layout) {
+  if (layout) {
     const layoutName = "Layout"
     imports.push(
       t.importDeclaration(
         [t.importDefaultSpecifier(t.identifier(layoutName))],
-        t.stringLiteral(writerOptions.layout)
+        t.stringLiteral(layout)
       )
     )
     wrappedDocument = t.jsxElement(
@@ -37,37 +72,44 @@ export default function(parsed: any, writerOptions = { layout: null }) {
   return generate(program).code
 }
 
-type ComponentImports = {
-  [type: string]: [string, string]
-}
-
-const defaultComponents: ComponentImports = {
-  document: ["@rst-js/react", "Document"],
-  section: ["@rst-js/react", "Section"],
-  title: ["@rst-js/react", "Title"],
-  paragraph: ["@rst-js/react", "Paragraph"]
-}
+type ImportType = "named" | "default"
 
 class DocumentState {
-  imports: { [module: string]: { [name: string]: boolean } }
+  imports: { [module: string]: { [name: string]: ImportType } }
   components: ComponentImports
 
-  constructor() {
+  constructor({ components }) {
     this.imports = {}
-    this.components = defaultComponents
+    this.components = components
   }
 
-  addImport(module, name) {
+  addImport(module, name, type: ImportType = "named") {
     if (this.imports[module] == null) {
       this.imports[module] = {}
     }
 
-    this.imports[module][name] = true
+    this.imports[module][name] = type
   }
 
   addElement(type) {
-    const [module, name] = this.components[type]
-    this.addImport(module, name)
+    const component = this.components[type]
+
+    if (component == null) {
+      console.error(type)
+      throw new Error(`Unknown component ${type}`)
+    }
+
+    let module,
+      name,
+      importType: ImportType = "named"
+    if (Array.isArray(component)) {
+      ;[module, name] = component
+    } else {
+      module = component
+      name = type.replace(/(^\w)|(_\w)/, match => match.toUpperCase())
+      importType = "default"
+    }
+    this.addImport(module, name, importType)
     return name
   }
 }
@@ -123,17 +165,17 @@ function getImports(documentState: DocumentState) {
     const specifiers = []
 
     Object.keys(documentState.imports[module]).forEach(name => {
-      specifiers.push(name)
+      const importType = documentState.imports[module][name]
+      if (importType === "default") {
+        specifiers.push(t.importDefaultSpecifier(t.identifier(name)))
+      } else {
+        specifiers.push(
+          t.importSpecifier(t.identifier(name), t.identifier(name))
+        )
+      }
     })
 
-    imports.push(
-      t.importDeclaration(
-        specifiers.map(name =>
-          t.importSpecifier(t.identifier(name), t.identifier(name))
-        ),
-        t.stringLiteral(module)
-      )
-    )
+    imports.push(t.importDeclaration(specifiers, t.stringLiteral(module)))
   }
 
   return imports

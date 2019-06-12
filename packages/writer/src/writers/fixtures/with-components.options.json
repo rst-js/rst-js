@@ -1,0 +1,7 @@
+{
+  "components": {
+    "section": ["components/rst", "Section"],
+    "title": ["components/rst", "Heading"],
+    "paragraph": "ui-lib/Text"
+  }
+}

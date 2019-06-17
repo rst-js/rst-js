@@ -1,0 +1,8 @@
+{
+  "name": "@rst-js/parser",
+  "description": "A reStructuredText parser for JavaScript",
+  "version": "0.0.0-managed-by-release-script",
+  "dependencies": {
+    "ramda": "^0.26.1"
+  }
+}

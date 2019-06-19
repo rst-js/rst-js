@@ -1,10 +1,9 @@
-import restructured from "restructured"
-
 import * as writers from "./writers"
+import { parse } from "@rst-js/parser"
 
 export function transform(source: string, writer: "jsx", writerOptions) {
   const writerModule = writers[writer]
 
-  const parsed = restructured.parse(source)
+  const parsed = parse(source)
   return writerModule(parsed, writerOptions)
 }

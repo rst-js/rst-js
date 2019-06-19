@@ -8,7 +8,7 @@
     "@babel/generator": "^7.4.4",
     "@babel/runtime": "^7.4.5",
     "@babel/types": "^7.4.4",
-    "restructured": "^0.0.11"
+    "@rst-js/parser": "0.0.0-managed-by-release-script"
   },
   "devDependencies": {
     "@types/prettier": "^1.16.4",

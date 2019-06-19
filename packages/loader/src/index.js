@@ -4,5 +4,10 @@ import { transform } from "@rst-js/writer"
 export default function loader(source) {
   const options = getOptions(this)
 
-  return transform(source, "jsx", options)
+  try {
+    return transform(source, "jsx", options)
+  } catch (e) {
+    console.error(e)
+    return source
+  }
 }

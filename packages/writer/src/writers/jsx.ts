@@ -154,14 +154,14 @@ const componentTypes = [
   "section",
   "title",
   "paragraph",
-  "strong",
+  "strongEmphasis",
   "emphasis",
-  // "interpreted_text",
-  "literal",
-  "reference",
-  "substitution_reference",
-  "footnote_reference",
-  "citation_reference",
+  "interpretedText",
+  "inlineLiteral",
+  "externalReference",
+  "substitutionReference",
+  "footnoteReference",
+  // "citationReference",
 
   "bullet_list",
   "enumerated_list",
@@ -173,7 +173,9 @@ const componentTypes = [
 
   "literal_block",
   "block_quote",
-  "transition"
+  "transition",
+
+  "directive"
 ] as const
 
 type ComponentImports = {

@@ -12,6 +12,10 @@ module.exports = {
       path: "writer"
     },
     {
+      type: "universal",
+      path: "parser"
+    },
+    {
       type: "node",
       path: "loader"
     },

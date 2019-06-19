@@ -91,7 +91,6 @@ EscapedMarkupStartString = EscapeChar char:InlineMarkupStartString {
 InlineMarkupStartString =
    StrongEmphasisStart /
    EmphasisStart /
-   InterpretedTextStart /
    ExternalReferenceStart /
    FootnoteReferenceStart /
    SubstitutionReferenceStart /
@@ -101,7 +100,6 @@ InlineMarkupStartString =
 InlineMarkupEndString =
    StrongEmphasisEnd /
    EmphasisEnd /
-   InterpretedTextEnd /
    ExternalReferenceEnd /
    FootnoteReferenceEnd /
    SubstitutionReferenceEnd /
@@ -137,73 +135,73 @@ ExternalReferenceEnd = '`_'
 Emphasis =
   !EscapeChar
   EmphasisStart
-  children:InlineMarkupText
-  EmphasisEnd
+  text:InlineMarkupText
+  (EmphasisEnd / &{ error("Emphasis isn't terminated.") })
   {
-    return tokens.emphasis(children)
+    return tokens.emphasis([tokens.text(text)])
   }
 
 StrongEmphasis =
   !EscapeChar
   StrongEmphasisStart
-  children:InlineMarkupText
-  StrongEmphasisEnd
+  text:InlineMarkupText
+  (StrongEmphasisEnd / &{ error("Strong emphasis isn't terminated.") })
   {
-    return tokens.strongEmphasis(children)
+    return tokens.strongEmphasis([tokens.text(text)])
   }
 
 InterpretedText =
   !EscapeChar
   InterpretedTextStart
-  children:InlineMarkupText
-  InterpretedTextEnd
+  text:InlineMarkupText
+  (InterpretedTextEnd / &{ error("Interprered text isn't terminated.") })
   {
-    return tokens.interpretedText(children)
+    return tokens.interpretedText([tokens.text(text)])
   }
 
 InlineLiteral =
   !EscapeChar
   InlineLiteralStart
-  children:InlineMarkupText
-  InlineLiteralEnd
+  text:InlineMarkupText
+  (InlineLiteralEnd / &{ error("Literal isn't terminated.") })
   {
-    return tokens.inlineLiteral(children)
+    return tokens.inlineLiteral([tokens.text(text)])
   }
 
 SubstitutionReference =
   !EscapeChar
   SubstitutionReferenceStart
-  children:InlineMarkupText
-  SubstitutionReferenceEnd
+  text:InlineMarkupText
+  (SubstitutionReferenceEnd / &{ error("Substitution reference isn't terminated.") })
   {
-    return tokens.substitutionReference(children)
+    return tokens.substitutionReference([tokens.text(text)])
   }
 
 InternalReference =
   !EscapeChar
   InternalReferenceStart
-  children:InlineMarkupText
-  InternalReferenceEnd
+  text:InlineMarkupText
+  (InternalReferenceEnd / &{ error("Reference isn't terminated.") })
   {
-    return tokens.internalReference(children)
+    return tokens.internalReference([tokens.text(text)])
   }
 
 ExternalReference =
   !EscapeChar
   ExternalReferenceStart
-  children:InlineMarkupText
+  text:InlineMarkupText
   ExternalReferenceEnd
   {
-    return tokens.externalReference(children)
+    return tokens.externalReference([tokens.text(text)])
   }
 
 FootnoteReference =
   !EscapeChar
   FootnoteReferenceStart
-  children:InlineMarkupText
-  FootnoteReferenceEnd
+  text:InlineMarkupText
+  (FootnoteReferenceEnd / &{ error("Footnote reference isn't terminated.") })
   {
-    return tokens.footnoteReference(children)
+    return tokens.footnoteReference([tokens.text(text)])
   }
 
 // Block Markup

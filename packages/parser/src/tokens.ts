@@ -10,44 +10,44 @@ export const text = value => ({
   value
 })
 
-export const emphasis = value => ({
+export const emphasis = children => ({
   type: "emphasis",
-  value
+  children
 })
 
-export const strongEmphasis = value => ({
+export const strongEmphasis = children => ({
   type: "strongEmphasis",
-  value
+  children
 })
 
-export const interpretedText = value => ({
+export const interpretedText = children => ({
   type: "interpretedText",
-  value
+  children
 })
 
-export const inlineLiteral = value => ({
+export const inlineLiteral = children => ({
   type: "inlineLiteral",
-  value
+  children
 })
 
-export const substitutionReference = value => ({
+export const substitutionReference = children => ({
   type: "substitutionReference",
-  value
+  children
 })
 
-export const internalReference = value => ({
+export const internalReference = children => ({
   type: "internalReference",
-  value
+  children
 })
 
-export const externalReference = value => ({
+export const externalReference = children => ({
   type: "externalReference",
-  value
+  children
 })
 
-export const footnoteReference = value => ({
+export const footnoteReference = children => ({
   type: "footnoteReference",
-  value
+  children
 })
 
 // Block Elements

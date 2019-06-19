@@ -2,7 +2,10 @@
   "name": "@rst-js/parser",
   "description": "A reStructuredText parser for JavaScript",
   "version": "0.0.0-managed-by-release-script",
+  "main": "cjs/index.js",
+  "typings": "cjs/index.d.ts",
   "dependencies": {
+    "@babel/runtime": "^7.4.5",
     "ramda": "^0.26.1"
   }
 }

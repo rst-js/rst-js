@@ -1,5 +1,5 @@
 import { testRunner, trim } from "./utils"
-import { paragraph, section, text, title } from "../src/tokens"
+import { emphasis, paragraph, section, text, title } from "../src/tokens"
 
 describe("@rst-js/parser", () => {
   describe("section", () => {
@@ -100,6 +100,15 @@ describe("@rst-js/parser", () => {
             paragraph([text("Paragraph Three")])
           ])
         ]
+      },
+      {
+        name: "inline markup inside section title",
+        input: trim`
+          *****
+          *RST*
+          *****
+        `,
+        expected: [section(1, [title([emphasis([text("RST")])])])]
       }
     ])
   })

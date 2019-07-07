@@ -93,14 +93,17 @@ export function writeElement(
 
   Object.keys(props).forEach(key => {
     const value = props[key]
-    attributes.push(
-      t.jsxAttribute(
-        t.jsxIdentifier(key),
-        typeof value === "string"
-          ? t.stringLiteral(value)
-          : t.jsxExpressionContainer(t.numericLiteral(value))
-      )
-    )
+
+    let astValue
+    if (Array.isArray(value)) {
+      astValue = t.jsxExpressionContainer(t.arrayExpression(value))
+    } else if (typeof value === "string") {
+      astValue = t.stringLiteral(value)
+    } else {
+      astValue = t.jsxExpressionContainer(t.numericLiteral(value))
+    }
+
+    attributes.push(t.jsxAttribute(t.jsxIdentifier(key), astValue))
   })
 
   const elementChildren = children.map((tokenProps: any) =>

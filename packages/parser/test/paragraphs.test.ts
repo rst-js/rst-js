@@ -37,11 +37,12 @@ describe("@rst-js/parser", () => {
         ]
       },
       {
-        name: "leading whitespace is ignored",
-        input: `Hello
-                World with leading whitespace    
+        name: "unexpected leading whitespace causes an error",
+        input: trim`
+          Hello
+             World with leading whitespace    
         `,
-        expected: [paragraph([text("Hello World with leading whitespace")])]
+        error: "Unexpected indent"
       }
     ])
   })

@@ -28,10 +28,21 @@ export function trim(strings, ...values) {
 
   // Split on newlines.
   let lines = output.split(/(?:\r\n|\n|\r)/)
+  const firstLine = lines.find(line => line.match(/^\s+[^\s]/)) || ""
+  const indentSize = firstLine.replace(/^(\s+).*/, "$1").length
+  const newIndent = size => {
+    const newIndentSize = size - indentSize
+    if (newIndentSize <= 0) return ""
+    return " ".repeat(newIndentSize)
+  }
 
   // Rip out the leading whitespace.
   return lines
-    .map(line => line.replace(/^\s+/gm, ""))
+    .map(line =>
+      line
+        .replace(/^\s+/g, matched => newIndent(matched.length))
+        .replace(/^\s+$/, "")
+    )
     .join("\n")
     .trim()
 }

@@ -25,18 +25,48 @@
 
       return newTokens
    }
+
+   function showCurrentLocation(message = 'Current location:') {
+      const loc = location()
+      const lines = input.split('\n')
+
+      return [
+         message,
+         '',
+         lines.slice(loc.start.line - 3, loc.start.line).join("⏎\n") + "⏎",
+         `${" ".repeat(loc.start.column - 1)}^`,
+         lines.slice(loc.start.line, loc.start.line + 3).join("⏎\n"),
+      ].join("\n")
+   }
+
+   function _error(message) {
+      error(showCurrentLocation(message))
+   }
+
+   function debug() {
+      console.log(showCurrentLocation())
+   }
 }
 
 // Remove leading/trailing whitespace in the document
 // and process children.
 Document =
    Blankline*
-   children:DocumentElement*
-   Blankline*
-   Lastline
+   firstChild:DocumentElement?
+   children:(Blankline+ DocumentElement)*
+   Blankline* Whitespace* Eof
    {
-      return tokens.document(children)
+      if (firstChild == null) return tokens.document([])
+
+      return tokens.document([firstChild, ...mapByIndex(children, 1)])
    }
+
+Debug = &(. / !.
+   &{
+      debug()
+      return true
+   }
+)
 
 // Top-level document elements
 DocumentElement
@@ -44,6 +74,8 @@ DocumentElement
    / BodyElement
 
 BodyElement =
+   FieldList /
+   Directive /
    Paragraph
 
 InlineMarkup "InlineMarkup" =
@@ -58,15 +90,17 @@ InlineMarkup "InlineMarkup" =
    Text
 
 // Common
-Newline = '\n' / last:('\r' '\n'?) { return last[0] + (last[1] || ''); }
+Newline "Newline" = '\n' / last:('\r' '\n'?) { return last[0] + (last[1] || ''); }
 
-Whitespace = ' ' / '\v' / '\f' / '\t'
+Whitespace "Whitespace" = ' ' / '\v' / '\f' / '\t'
 
 NormalizedToWhitespace = Whitespace / Newline
 
-Blankline "BlankLine" = Whitespace* Newline
+IgnoreWhitespace = Whitespace*
 
-Lastline = Whitespace* Endline
+Blankline "BlankLine" = IgnoreWhitespace Newline
+
+Lastline = IgnoreWhitespace Endline
 
 Blanklines = Blankline Blankline+
 
@@ -206,48 +240,122 @@ FootnoteReference =
 
 // Block Markup
 
+// I's possible to split paragraph to multiple lines but only if following
+// line starts with expected indent.
+ParagraphLine = BlockIndent text:InlineMarkup+ { return text }
+
 Paragraph =
-   children:(Whitespace* InlineMarkup+ Blankline?)+
-   Blankline*
+   firstChild:ParagraphLine
+   children:(Blankline ExpectedIndent ParagraphLine)*
    {
-      const flatTokens = R.flatten(mapByIndex(children, 1))
-      return tokens.paragraph(concatTexts(flatTokens))
+      const lines = R.flatten([firstChild, ...mapByIndex(children, 2)])
+      return tokens.paragraph(concatTexts(lines))
+   }
+
+FieldList = firstChild:Field fields:(Blankline ExpectedIndent Field)*
+   {
+      return tokens.fieldList([firstChild, ...mapByIndex(fields, 2)])
+   }
+
+Field = BlockIndent ':' name:[^:]+ ':' Whitespace+ children:InlineMarkup+
+   {
+      return tokens.field(name.join(""), children)
+   }
+
+Directive =
+   BlockIndent
+   directive:(
+      DirectiveWithEverything /
+      DirectiveWithOptions /
+      DirectiveWithContent /
+      DirectiveOneLine
+   )
+   { return directive }
+
+DirectiveWithEverything =
+   name:DirectiveName args:DirectiveArguments? Blankline
+   PushIndent
+   options:DirectiveOptions Blankline
+   Blankline+
+   content:DirectiveContent
+   PullIndent
+   {
+      return tokens.directive(name, args, options, content)
+   }
+
+DirectiveWithContent =
+   name:DirectiveName args:DirectiveArguments? Blankline
+   Blankline*
+   PushIndent
+   content:DirectiveContent
+   PullIndent
+   {
+      return tokens.directive(name, args, null, content)
+   }
+
+DirectiveWithOptions =
+   name:DirectiveName args:DirectiveArguments? Blankline
+   PushIndent
+   options:DirectiveOptions
+   PullIndent
+   {
+      return tokens.directive(name, args, options, null)
+   }
+
+DirectiveOneLine = name:DirectiveName args:DirectiveArguments?
+   {
+      return tokens.directive(name, args)
+   }
+
+
+DoubleColon = "::"
+
+DirectiveName = ".. " name:(!DoubleColon .)+ DoubleColon
+   {
+      return mapByIndex(name, 1).join("")
+   }
+
+DirectiveArguments = Whitespace+ args:InlineMarkup*
+   {
+      return args
+   }
+
+DirectiveOptions = fields:FieldList
+   {
+      return fields.children
+   }
+
+DirectiveContent =
+   firstChild:BodyElement
+   children:(Blankline+ ExpectedIndent BodyElement)*
+   {
+      return [firstChild, ...mapByIndex(children, 2)]
    }
 
 // Sections
 Section =
    title:Title
-   children:((IsSubSection Section) / (!IsSection BodyElement))*
-   Blankline*
+   children:(Blankline+ !IsNextSection DocumentElement)*
    {
       const depth = document.popSection()
-      return tokens.section(depth, [title, ...mapByIndex(children, 1)])
+      return tokens.section(depth, [title, ...mapByIndex(children, 2)])
    }
 
-IsSection = &(
-   SectionLine Blankline
-   Whitespace* InlineMarkup+ Blankline
-   SectionLine Blankline?
-) / &(
-   Whitespace* InlineMarkup+ Blankline
-   SectionLine Blankline?
-)
-
-IsSubSection = &(
-   over:(o:SectionLine Blankline { return o })?
-   line:(Whitespace* InlineMarkup+ Blankline)
+IsNextSection = &(
+   over:(line:SectionLine Blankline { return line })?
+   line:(IgnoreWhitespace InlineMarkup+ Blankline)
    under:SectionLine Blankline?
    &{
-      if (over != null && over[0] !== under[0]) return false
+      if (over != null && over !== under) return false
 
-      return document.isSubSection(under[0], over != null)
+      return !document.isSubSection(under[0], over != null)
    }
 )
 
 Title "Title" =
-   over:(o:SectionLine Blankline { return o })?
-   Whitespace* children:InlineMarkup+ Blankline
-   under:SectionLine Blankline*
+   over:(line:SectionLine Blankline { return line })?
+   IgnoreWhitespace children:InlineMarkup+ Blankline
+   under:SectionLine Blankline?
    {
       if (over != null && over !== under) error("Section overline must match underline")
 
@@ -262,3 +370,35 @@ SectionLine "SectionLine" =
   & { return R.uniq(line).length === 1 }
 
   { return line.join('') }
+
+// Indent
+PushIndent = &(indent:Whitespace+
+   {
+      document.pushIndent(indent.length)
+      return true
+   })
+
+
+PullIndent = &(Blankline* indent:Whitespace*
+   &{
+      if (!indent.length) {
+         document.clearIndent()
+      } else {
+         document.pullIndent(indent.length)
+      }
+      return true
+   })
+
+ExpectedIndent "ExpectedIndent" = &(indent:Whitespace*
+   &{
+      return document.getCurrentIndent() === indent.length
+   })
+
+BlockIndent "BlockIndent" = indent:Whitespace*
+   &{
+      if (document.getCurrentIndent() !== indent.length) {
+         _error(`Unexpected indent - ${document.getCurrentIndent()} spaces were expected, got ${indent.length}.`)
+      }
+
+      return true
+   }

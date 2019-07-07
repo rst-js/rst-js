@@ -1,3 +1,7 @@
+import { defaultTo } from "ramda"
+
+const defaultList = defaultTo([])
+
 export const document = children => ({
   type: "document",
   children
@@ -66,4 +70,28 @@ export const section = (depth, children) => ({
 export const title = children => ({
   type: "title",
   children
+})
+
+export const fieldList = children => ({
+  type: "fieldList",
+  children
+})
+
+export const field = (name, children) => ({
+  type: "field",
+  name,
+  children
+})
+
+export const directive = (
+  name,
+  args = null,
+  options = null,
+  children = null
+) => ({
+  type: "directive",
+  name,
+  args: defaultList(args),
+  options: defaultList(options),
+  children: defaultList(children)
 })

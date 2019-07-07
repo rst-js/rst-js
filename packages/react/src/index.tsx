@@ -17,10 +17,10 @@ export const Title = ({ children }) => {
 
 export const Document = "article"
 export const Paragraph = "p"
-export const Strong = "strong"
+export const StrongEmphasis = "strong"
 export const Emphasis = "em"
-export const Literal = "code"
-export const Reference = "a"
+export const InlineLiteral = "code"
+export const ExternalReference = "a"
 export const BulletList = "ul"
 export const ListItem = "li"
 export const EnumeratedList = "ol"
